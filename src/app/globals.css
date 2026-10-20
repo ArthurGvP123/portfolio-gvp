@@ -1,0 +1,225 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   FLUID TYPOGRAPHY ROOT & THEME COLOR SYSTEM
+   ========================================================================== */
+
+:root {
+  /* Fluid font sizing: 1rem = 1vw clamped between 14px and 22px */
+  font-size: clamp(14px, 1vw, 22px);
+
+  /* Single Theme: Obsidian Dark Luxury */
+  --bg-primary: #050505;
+  --bg-secondary: #0e0e0e;
+  --bg-tertiary: #141414;
+  --fg-primary: #f5f5f5;
+  --fg-secondary: #888888;
+  --fg-muted: #525252;
+  --border-hairline: #1a1a1a;
+  --border-strong: rgba(255, 255, 255, 0.22);
+  --accent-primary: #ffffff;
+  --accent-contrast: #050505;
+  --glare-specular: rgba(255, 255, 255, 0.30);
+
+  --badge-case-bg: rgba(255, 255, 255, 0.08);
+  --badge-case-fg: #f5f5f5;
+  --badge-shot-bg: rgba(255, 255, 255, 0.05);
+  --badge-shot-fg: #888888;
+  --badge-wip-bg: rgba(255, 255, 255, 0.03);
+  --badge-wip-fg: #525252;
+}
+
+@media (max-width: 768px) {
+  :root {
+    font-size: 16px;
+  }
+}
+
+/* ==========================================================================
+   GLOBAL RESET, ZERO-SCROLLBAR SYSTEM & ROOT LAYOUT
+   ========================================================================== */
+
+/* Universal zero-scrollbar across Gecko (Firefox) & Trident/EdgeHTML */
+html,
+body,
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -ms-overflow-style: none !important; /* Trident / Legacy Edge */
+  scrollbar-width: none !important; /* Gecko / Firefox */
+  scrollbar-gutter: auto !important;
+  scrollbar-color: transparent transparent !important;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Universal zero-scrollbar across all modern WebKit/Blink browsers (Chrome, Edge, Safari, Opera) */
+::-webkit-scrollbar,
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  -webkit-appearance: none !important;
+}
+
+::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb,
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track,
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+::-webkit-scrollbar-track-piece,
+*::-webkit-scrollbar-track-piece,
+::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner,
+::-webkit-scrollbar-button,
+*::-webkit-scrollbar-button,
+::-webkit-resizer,
+*::-webkit-resizer {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+html, body {
+  min-height: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+  background-color: var(--bg-primary);
+  color: var(--fg-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Lenis Smooth Scroll Recommended Foundation */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+html:not(.lenis) {
+  scroll-behavior: smooth;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+[data-lenis-prevent],
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+::selection {
+  background-color: var(--fg-primary);
+  color: var(--bg-primary);
+}
+
+/* ==========================================================================
+   SWISS BRUTALIST GRID & UTILITIES
+   ========================================================================== */
+
+.hairline-grid {
+  background-size: 100% 100%;
+  background-image: linear-gradient(
+    to right,
+    var(--border-hairline) 1px,
+    transparent 1px
+  );
+}
+
+/* Double-layer rollover hover link */
+.link-inner {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.link-inner > span {
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.link-inner > .link-shadow {
+  position: absolute;
+  top: 100%;
+  left: 0;
+}
+
+.link-inner:hover > .link-label {
+  transform: translateY(-100%);
+}
+
+.link-inner:hover > .link-shadow {
+  transform: translateY(-100%);
+}
+
+/* Reduced Motion Safety */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar,
+  .no-scrollbar *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+    -webkit-appearance: none !important;
+  }
+  .no-scrollbar::-webkit-scrollbar-thumb,
+  .no-scrollbar *::-webkit-scrollbar-thumb,
+  .no-scrollbar::-webkit-scrollbar-track,
+  .no-scrollbar *::-webkit-scrollbar-track,
+  .no-scrollbar::-webkit-scrollbar-corner,
+  .no-scrollbar *::-webkit-scrollbar-corner {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}

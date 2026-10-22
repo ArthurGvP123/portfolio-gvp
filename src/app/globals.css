@@ -10,25 +10,25 @@
   /* Fluid font sizing: 1rem = 1vw clamped between 14px and 22px */
   font-size: clamp(14px, 1vw, 22px);
 
-  /* Single Theme: Obsidian Dark Luxury */
-  --bg-primary: #050505;
-  --bg-secondary: #0e0e0e;
-  --bg-tertiary: #141414;
-  --fg-primary: #f5f5f5;
-  --fg-secondary: #888888;
-  --fg-muted: #525252;
-  --border-hairline: #1a1a1a;
-  --border-strong: rgba(255, 255, 255, 0.22);
-  --accent-primary: #ffffff;
-  --accent-contrast: #050505;
-  --glare-specular: rgba(255, 255, 255, 0.30);
+  /* Cosmic Digital Brutalism Theme Colors */
+  --bg-primary: #100d0e;
+  --bg-secondary: #1a1517;
+  --bg-tertiary: #241d20;
+  --fg-primary: #fcfcfc;
+  --fg-secondary: #a8a4a5;
+  --fg-muted: #5e595a;
+  --border-hairline: #2b2326;
+  --border-strong: rgba(252, 252, 252, 0.22);
+  --accent-primary: #fcfcfc;
+  --accent-contrast: #100d0e;
+  --glare-specular: rgba(252, 252, 252, 0.30);
 
-  --badge-case-bg: rgba(255, 255, 255, 0.08);
-  --badge-case-fg: #f5f5f5;
-  --badge-shot-bg: rgba(255, 255, 255, 0.05);
-  --badge-shot-fg: #888888;
-  --badge-wip-bg: rgba(255, 255, 255, 0.03);
-  --badge-wip-fg: #525252;
+  --badge-case-bg: rgba(252, 252, 252, 0.08);
+  --badge-case-fg: #fcfcfc;
+  --badge-shot-bg: rgba(252, 252, 252, 0.05);
+  --badge-shot-fg: #a8a4a5;
+  --badge-wip-bg: rgba(252, 252, 252, 0.03);
+  --badge-wip-fg: #5e595a;
 }
 
 @media (max-width: 768px) {
@@ -101,7 +101,7 @@ html, body {
   scrollbar-width: none !important;
   background-color: var(--bg-primary);
   color: var(--fg-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-space-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -190,6 +190,30 @@ html:not(.lenis) {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ==========================================================================
+   3D ROTATING LOGO ANIMATION (Y-AXIS CONTINUOUS ORBIT)
+   ========================================================================== */
+
+@keyframes spinY {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+.animate-spin-y {
+  animation: spinY 8s linear infinite;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.group:hover .animate-spin-y,
+.animate-spin-y:hover {
+  animation-duration: 2.2s;
 }
 
 /* ==========================================================================

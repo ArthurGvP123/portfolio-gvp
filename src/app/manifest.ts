@@ -15,8 +15,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Award-winning caliber interactive portfolio featuring dual-view Cards & 3D WebGL Sphere showcase, Swiss brutalist typography, and tactile micro-interactions.",
     start_url: "/",
     display: "standalone",
-    background_color: "#050505",
-    theme_color: "#050505",
+    background_color: "#100d0e",
+    theme_color: "#100d0e",
     orientation: "portrait-primary",
     scope: "/",
     icons: [

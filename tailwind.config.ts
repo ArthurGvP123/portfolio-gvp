@@ -9,6 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        black: "#100d0e",
+        white: "#fcfcfc",
         background: "var(--bg-primary)",
         "background-secondary": "var(--bg-secondary)",
         "background-tertiary": "var(--bg-tertiary)",
@@ -23,8 +25,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "-apple-system", "sans-serif"],
-        mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
+        sans: ["var(--font-space-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
+        mono: ["var(--font-space-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       aspectRatio: {
         "16/9": "16 / 9",

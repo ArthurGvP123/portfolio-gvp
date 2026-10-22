@@ -6,7 +6,7 @@ export const PROFILE_DATA: ProfileData = {
   name: "Arthur Gregorius Pongoh",
   shortName: "Arthur GvP",
   headline: "COMPUTER ENGINEER & CREATIVE TECHNOLOGIST",
-  subline: "Architecting High-Performance Intelligence, Fullstack Systems & Kinetic Visual Experiences",
+  subline: "Architecting High-Performance Intelligence, Fullstack Systems & Visual Experiences",
   location: "Rawamangun, Jakarta Timur, DKI Jakarta, Indonesia",
   timezone: "Asia/Jakarta (WIB / UTC+7)",
   email: "arthurgregorius333@gmail.com",

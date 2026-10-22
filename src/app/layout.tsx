@@ -1,8 +1,17 @@
 import type { Metadata, Viewport } from "next";
+import { Space_Mono } from "next/font/google";
 import "./globals.css";
 import { SmoothScrollProvider } from "@/components/common/SmoothScrollProvider";
+import { Preloader } from "@/components/common/Preloader";
 import { Header } from "@/components/navigation/Header";
 import { KineticNavbarOverlay } from "@/components/navigation/KineticNavbarOverlay";
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -17,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s // Arthur GvP",
   },
   description:
-    "Award-winning caliber interactive portfolio featuring dual-view Cards & 3D WebGL Sphere showcase, Swiss brutalist typography, and tactile micro-interactions.",
+    "Interactive portfolio of Arthur Gregorius Pongoh — Systems Architect & Creative Technologist.",
   keywords: [
     "Arthur Gregorius Pongoh",
     "Systems Architect",
@@ -39,7 +48,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Arthur Gregorius Pongoh — Systems Architect & Creative Technologist",
     description:
-      "Award-winning caliber interactive portfolio featuring dual-view Cards & 3D WebGL Sphere showcase, Swiss brutalist typography, and tactile micro-interactions.",
+      "Interactive portfolio of Arthur Gregorius Pongoh — Systems Architect & Creative Technologist.",
     url: "https://arthurgvp.dev",
     siteName: "Arthur Gregorius Pongoh Portfolio",
     locale: "en_US",
@@ -49,7 +58,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Arthur Gregorius Pongoh — Systems Architect & Creative Technologist",
     description:
-      "Award-winning caliber interactive portfolio featuring dual-view Cards & 3D WebGL Sphere showcase, Swiss brutalist typography, and tactile micro-interactions.",
+      "Interactive portfolio of Arthur Gregorius Pongoh — Systems Architect & Creative Technologist.",
     creator: "@arthurgvp",
   },
   robots: {
@@ -63,6 +72,13 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  icons: {
+    icon: [
+      { url: "/icon.png", sizes: "any" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/apple-icon.png" }],
+  },
 };
 
 export default function RootLayout({
@@ -71,9 +87,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-foreground selection:text-background pt-14 sm:pt-16">
+    <html lang="en" className={spaceMono.variable} suppressHydrationWarning>
+      <body className="min-h-screen bg-background text-foreground font-mono antialiased selection:bg-foreground selection:text-background">
         <SmoothScrollProvider>
+          <Preloader />
           <Header />
           <KineticNavbarOverlay />
           {children}

@@ -30,11 +30,11 @@ export const CONTACT_CHANNELS: ContactChannel[] = [
   },
   {
     platform: "WhatsApp",
-    label: "+62 895-3256-05798",
-    url: "https://wa.me/62895325605798",
+    label: "+62 812-9846-0793",
+    url: "https://wa.me/6281298460793",
     icon: "MessageCircle",
     primary: true,
-    handle: "+62 895-3256-05798",
+    handle: "+62 812-9846-0793",
     actionText: "Direct Message"
   },
   {

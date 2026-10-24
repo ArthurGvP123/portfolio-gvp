@@ -23,12 +23,12 @@ export async function generateMetadata({
 
   if (!project) {
     return {
-      title: "Project Not Found // Arthur GvP",
+      title: "Project Not Found - ArthurGvP",
     };
   }
 
   return {
-    title: `${project.title} // Arthur GvP`,
+    title: `${project.title} - ArthurGvP`,
     description: project.summary || project.subtitle,
   };
 }
@@ -42,15 +42,18 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
   }
 
   return (
-    <main className="min-h-screen flex flex-col justify-between pt-24 sm:pt-32 px-4 sm:px-6 lg:px-8 selection:bg-foreground selection:text-background">
-      <div className="flex-1 flex flex-col items-center justify-center text-center">
+    <main className="w-full min-h-screen flex flex-col relative selection:bg-foreground selection:text-background">
+      {/* 1st Viewport Section: 100% Screen Height, Dead-Center Title */}
+      <section className="w-full h-screen h-dvh min-h-screen min-h-dvh flex flex-col items-center justify-center px-4 text-center relative">
         <h1 className="text-3xl sm:text-5xl md:text-7xl font-black font-sans uppercase tracking-tight text-foreground">
           {project.title}
         </h1>
         <p className="mt-3 text-sm font-mono text-foreground-secondary uppercase tracking-widest">
           Work Detail // {slug}
         </p>
-      </div>
+      </section>
+
+      {/* Footer positioned below 1st viewport fold (scroll to reveal) */}
       <TactileFooter />
     </main>
   );

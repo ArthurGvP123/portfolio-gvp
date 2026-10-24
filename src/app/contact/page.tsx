@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
-import { TactileFooter } from "@/components/footer/TactileFooter";
+import { ContactNeuralMesh } from "@/components/contact/ContactNeuralMesh";
 
 export const metadata: Metadata = {
-  title: "Contact // Arthur GvP",
-  description: "Get in touch with Arthur Gregorius Pongoh.",
+  title: "Contact - ArthurGvP",
+  description:
+    "Get in touch with Arthur Gregorius Pongoh — Systems Architect & Creative Technologist.",
 };
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen flex flex-col justify-between pt-24 sm:pt-32 px-4 sm:px-6 lg:px-8 selection:bg-foreground selection:text-background">
-      <div className="flex-1 flex items-center justify-center">
-        <h1 className="text-4xl sm:text-6xl md:text-8xl font-black font-sans uppercase tracking-tight text-foreground text-center">
-          Contact
-        </h1>
-      </div>
-      <TactileFooter />
+    <main className="w-full min-h-screen bg-background">
+      <ContactNeuralMesh />
     </main>
   );
 }

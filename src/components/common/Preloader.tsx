@@ -45,7 +45,9 @@ export interface RouteMeta {
 }
 
 export function getRouteMeta(path: string): RouteMeta {
-  if (path.startsWith("/work")) {
+  const cleanPath = (path || "/").replace(/\/+$/, "") || "/";
+
+  if (cleanPath.startsWith("/work")) {
     return {
       sectorTag: "02_WORK",
       kernelTitle: "[ ⏣ ARTIFACT_ARCHIVE_V2.0 ] // SECTOR: 02_WORK",
@@ -66,7 +68,7 @@ export function getRouteMeta(path: string): RouteMeta {
     };
   }
 
-  if (path === "/contact") {
+  if (cleanPath.startsWith("/contact")) {
     return {
       sectorTag: "03_CONTACT",
       kernelTitle: "[ ⏣ TRANSMISSION_BEACON_V2.0 ] // SECTOR: 03_CONTACT",
@@ -93,17 +95,17 @@ export function getRouteMeta(path: string): RouteMeta {
     kernelTitle: "[ ⏣ SINGULARITY_KERNEL_V2.0 ] // SECTOR: 01_HOME",
     displayTitle: "ARTHUR GREGORIUS PONGOH",
     subtitle: "SOFTWARE ENGINEER // SYSTEMS ARCHITECT & AI",
-    recordId: "RECORD // ID: GVP-2026 // SECTOR: CORE_NUCLEUS",
+    recordId: "RECORD // ID: GVP-2026 // SECTOR: NEXUS",
     sectorBadge: "SECTOR_01 // SYSTEM OVERVIEW & ENGINEERING ARCHITECTURE",
-    targetBuffer: "[ SECTOR_01 // HOME_NUCLEUS ]",
+    targetBuffer: "[ SECTOR_01 // HOME_NEXUS ]",
     centerGlyph: "⏣",
-    signalLockedText: "SIGNAL: CORE_NUCLEUS_LOCKED",
+    signalLockedText: "SIGNAL: NEXUS_LOCKED",
     logs: [
       "> INITIALIZING CORE OBSERVATORY SYSTEMS... [OK]",
       "> SYNCHRONIZING FULLSTACK, ARCHITECTURE & AI ARRAYS... [OK]",
       "> PROBING SINGULARITY EVENT HORIZON... [OK]",
       "> GRAVITATIONAL MATRIX STABILIZED. PREPARING HOME VIEW... [99%]",
-      "> CORE NUCLEUS ONLINE. WELCOME.",
+      "> NEXUS SYSTEM ONLINE. WELCOME.",
     ],
   };
 }
@@ -185,12 +187,32 @@ export function Preloader({ onComplete }: PreloaderProps) {
         },
         0.05
       );
+
+      // Dispatch event as curtains have fully split open to expose header bloom to the user
+      tl.call(
+        () => {
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("preloader:reveal"));
+          }
+        },
+        [],
+        0.65
+      );
     } else if (containerRef.current) {
       tl.to(containerRef.current, {
         opacity: 0,
         duration: 0.45,
         ease: "power2.inOut",
       });
+      tl.call(
+        () => {
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("preloader:reveal"));
+          }
+        },
+        [],
+        0.2
+      );
     }
   }, []);
 
@@ -225,21 +247,25 @@ export function Preloader({ onComplete }: PreloaderProps) {
 
   // Main animation runner triggered when pathname is initialized or changes to Home, Work, or Contact
   useEffect(() => {
+    const cleanPath = (pathname || "/").replace(/\/+$/, "") || "/";
     const isSupportedRoute =
-      pathname === "/" || pathname.startsWith("/work") || pathname === "/contact";
+      cleanPath === "/" || cleanPath.startsWith("/work") || cleanPath.startsWith("/contact");
 
     // If already initialized and pathname hasn't changed or is unsupported, skip
     if (!isSupportedRoute) {
       setIsUnmounted(true);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("preloader:reveal"));
+      }
       return;
     }
 
-    if (prevPathnameRef.current === pathname) {
+    if (prevPathnameRef.current === cleanPath) {
       return;
     }
 
     const isFirstLoad = prevPathnameRef.current === null;
-    prevPathnameRef.current = pathname;
+    prevPathnameRef.current = cleanPath;
 
     // Check user preference for reduced motion
     const prefersReducedMotion =
@@ -250,11 +276,14 @@ export function Preloader({ onComplete }: PreloaderProps) {
       setProgress(100);
       if (onCompleteRef.current) onCompleteRef.current();
       setIsUnmounted(true);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("preloader:reveal"));
+      }
       return;
     }
 
     // Update metadata to target route
-    const meta = getRouteMeta(pathname);
+    const meta = getRouteMeta(cleanPath);
     setCurrentRouteMeta(meta);
 
     // Reset curtains to closed state
@@ -310,6 +339,14 @@ export function Preloader({ onComplete }: PreloaderProps) {
       tween.kill();
     };
   }, []);
+
+  // Ensure curtains are always at closed baseline (yPercent: 0) whenever unmounted status resets to false
+  useEffect(() => {
+    if (!isUnmounted && topCurtainRef.current && bottomCurtainRef.current) {
+      gsap.set(topCurtainRef.current, { yPercent: 0 });
+      gsap.set(bottomCurtainRef.current, { yPercent: 0 });
+    }
+  }, [isUnmounted]);
 
   if (isUnmounted) {
     return null;

@@ -7,7 +7,7 @@ import { useNavStore } from "@/hooks/useNavStore";
 import { JakartaClock } from "./JakartaClock";
 import { AsciiLogo } from "@/components/common/AsciiLogo";
 import { playHapticClick } from "@/utils/audio";
-import { X, ArrowUpRight, Copy, Check } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLenis } from "@/components/common/SmoothScrollProvider";
 import gsap from "gsap";
@@ -17,6 +17,9 @@ interface NavItem {
   num: string;
   label: string;
   href: string;
+  sectorTag: string;
+  glyph: string;
+  description: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -25,112 +28,191 @@ const NAV_ITEMS: NavItem[] = [
     num: "01",
     label: "HOME",
     href: "/",
+    sectorTag: "SEC_01 // NEXUS",
+    glyph: "⏣",
+    description: "CORE OBSERVATORY & ARCHITECTURE",
   },
   {
     id: "work",
     num: "02",
     label: "WORK",
     href: "/work",
+    sectorTag: "SEC_02 // ARTIFACTS",
+    glyph: "◈",
+    description: "ENGINEERING DOSSIERS & SYSTEMS",
   },
   {
     id: "contact",
     num: "03",
     label: "CONTACT",
     href: "/contact",
+    sectorTag: "SEC_03 // UPLINK",
+    glyph: "⎔",
+    description: "DIRECT TRANSMISSION & FREQUENCIES",
   },
-];
-
-/* Contract compatibility for legacy test runners: num: "04" MAINTENANCE href: "/maintenance" */
-
-const SOCIAL_LINKS = [
-  { label: "GITHUB", url: "https://github.com/ArthurGvP123" },
-  {
-    label: "LINKEDIN",
-    url: "https://www.linkedin.com/in/arthur-gregorius-pongoh-125322248",
-  },
-  { label: "WHATSAPP", url: "https://wa.me/62895325605798" },
-  { label: "INSTAGRAM", url: "https://www.instagram.com/arthurgvp" },
 ];
 
 /**
- * Bleibtgleich-Style Card Navigation Overlay:
- * Emerges as a group of interactive floating cards with GSAP staggered slide-up animation.
- * Features clean 4-card route selection, Jakarta WIB clock, 1-click email copy, and social links.
+ * KineticNavbarOverlay:
+ * Cosmic Digital Brutalist Navigation Deck.
+ * Features synchronized GSAP entrance animations (backdrop fade, monolith zoom-in, staggered cards)
+ * and smooth exit animations when closed in-place without page navigation.
  */
 export function KineticNavbarOverlay() {
   const { isNavOpen, closeNav } = useNavStore();
   const { stop: stopLenis, start: startLenis } = useLenis();
   const pathname = usePathname();
   const prevPathnameRef = useRef(pathname);
+
+  // Keep component mounted during GSAP exit animation
+  const [isRendered, setIsRendered] = useState(isNavOpen);
+  const isClosingRef = useRef(false);
+
   const overlayRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const deckContainerRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const triggerElementRef = useRef<HTMLElement | null>(null);
-  const [copiedEmail, setCopiedEmail] = useState(false);
 
-  const email = "arthurgregorius333@gmail.com";
+  // Exit Animation function (plays when closing on same page)
+  const triggerExitAnimation = useCallback(
+    (onComplete?: () => void) => {
+      if (isClosingRef.current) return;
+      isClosingRef.current = true;
 
-  const handleCopyEmail = useCallback(() => {
-    playHapticClick(840);
-    navigator.clipboard
-      .writeText(email)
-      .then(() => {
-        setCopiedEmail(true);
-        setTimeout(() => setCopiedEmail(false), 2400);
-      })
-      .catch(() => {
-        setCopiedEmail(true);
-        setTimeout(() => setCopiedEmail(false), 2400);
+      const backdrop = backdropRef.current;
+      const deck = deckContainerRef.current;
+      const cards = cardsContainerRef.current?.querySelectorAll(".nav-menu-card");
+
+      if (!backdrop || !deck) {
+        setIsRendered(false);
+        isClosingRef.current = false;
+        closeNav();
+        onComplete?.();
+        return;
+      }
+
+      gsap.killTweensOf([backdrop, deck, ...(cards || [])]);
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setIsRendered(false);
+          isClosingRef.current = false;
+          closeNav();
+          onComplete?.();
+        },
       });
-  }, [email]);
 
-  const handleLinkClick = useCallback(() => {
-    playHapticClick(640);
-    closeNav();
-  }, [closeNav]);
+      if (cards && cards.length > 0) {
+        tl.to(cards, {
+          opacity: 0,
+          y: 18,
+          scale: 0.98,
+          duration: 0.2,
+          stagger: 0.03,
+          ease: "power2.in",
+        });
+      }
 
+      tl.to(
+        deck,
+        {
+          opacity: 0,
+          y: 28,
+          scale: 0.96,
+          duration: 0.28,
+          ease: "power3.inOut",
+        },
+        cards && cards.length > 0 ? "-=0.12" : 0
+      ).to(
+        backdrop,
+        {
+          opacity: 0,
+          duration: 0.24,
+          ease: "power2.in",
+        },
+        "-=0.18"
+      );
+    },
+    [closeNav]
+  );
+
+  // Close handler for manual dismiss (ESC button, ESC key, or backdrop click)
   const handleClose = useCallback(() => {
     playHapticClick(480);
+    triggerExitAnimation();
+  }, [triggerExitAnimation]);
+
+  // Click on a route item: immediate fast-close so Preloader curtain takes over seamlessly
+  const handleLinkClick = useCallback(() => {
+    playHapticClick(640);
+    isClosingRef.current = true;
+    setIsRendered(false);
     closeNav();
   }, [closeNav]);
 
-  // Close overlay only when pathname actually changes via navigation
+  // Synchronize state when isNavOpen changes
+  useEffect(() => {
+    if (isNavOpen) {
+      setIsRendered(true);
+      isClosingRef.current = false;
+    } else if (!isClosingRef.current && isRendered) {
+      // If toggled off from external trigger (e.g. Header button), execute smooth exit
+      triggerExitAnimation();
+    }
+  }, [isNavOpen, isRendered, triggerExitAnimation]);
+
+  // Pathname change listener (auto-close without exit animation so preloader takes over)
   useEffect(() => {
     if (prevPathnameRef.current !== pathname) {
       prevPathnameRef.current = pathname;
+      setIsRendered(false);
+      isClosingRef.current = false;
       closeNav();
     }
   }, [pathname, closeNav]);
 
-  // GSAP Staggered Entrance Animation for Navigation Cards
+  // GSAP Entrance Animation when overlay mounts
   useEffect(() => {
-    if (!isNavOpen || !cardsContainerRef.current) return;
+    if (!isRendered || isClosingRef.current) return;
 
-    const cards = cardsContainerRef.current.querySelectorAll(".nav-menu-card");
-    if (cards.length > 0) {
-      gsap.fromTo(
+    const backdrop = backdropRef.current;
+    const deck = deckContainerRef.current;
+    const cards = cardsContainerRef.current?.querySelectorAll(".nav-menu-card");
+
+    if (!backdrop || !deck) return;
+
+    gsap.killTweensOf([backdrop, deck, ...(cards || [])]);
+
+    const tl = gsap.timeline({
+      defaults: { ease: "power3.out" },
+    });
+
+    tl.fromTo(
+      backdrop,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.35, ease: "power2.out" }
+    ).fromTo(
+      deck,
+      { opacity: 0, y: 35, scale: 0.96 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.45 },
+      "-=0.22"
+    );
+
+    if (cards && cards.length > 0) {
+      tl.fromTo(
         cards,
-        {
-          y: 35,
-          opacity: 0,
-          scale: 0.97,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.45,
-          stagger: 0.07,
-          ease: "power3.out",
-          delay: 0.05,
-        }
+        { opacity: 0, y: 24, scale: 0.97 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.4, stagger: 0.07 },
+        "-=0.28"
       );
     }
-  }, [isNavOpen]);
+  }, [isRendered]);
 
   // Focus management, Escape key listener & Body scroll lock
   useEffect(() => {
-    if (!isNavOpen) return;
+    if (!isRendered) return;
 
     // Save invoking element for focus restoration upon exit
     triggerElementRef.current =
@@ -191,9 +273,9 @@ export function KineticNavbarOverlay() {
         triggerElementRef.current || document.getElementById("main-nav-trigger");
       trigger?.focus();
     };
-  }, [isNavOpen, handleClose, stopLenis, startLenis]);
+  }, [isRendered, handleClose, stopLenis, startLenis]);
 
-  if (!isNavOpen) {
+  if (!isRendered) {
     return null;
   }
 
@@ -203,25 +285,40 @@ export function KineticNavbarOverlay() {
       id="kinetic-navbar-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label="Navigation Menu"
+      aria-label="Navigation Menu Deck"
       tabIndex={-1}
       data-lenis-prevent
       className={cn(
         "fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 select-none font-mono overflow-y-auto no-scrollbar"
       )}
     >
-      {/* Dimmed Atmospheric Backdrop (Click outside to close) */}
+      {/* Dimmed Atmospheric Backdrop (Click outside to close with exit animation) */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity cursor-pointer"
+        ref={backdropRef}
+        className="fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity cursor-pointer"
         onClick={handleClose}
         aria-hidden="true"
       />
 
-      {/* Floating Card Navigation Container */}
-      <div className="relative z-10 max-w-5xl w-full max-h-[90vh] bg-[#100d0e] border border-border/80 rounded-sm shadow-2xl backdrop-blur-2xl flex flex-col justify-between p-5 sm:p-8 overflow-y-auto no-scrollbar">
-        {/* Top Bar: Brand, Jakarta Clock, Close Action */}
-        <div className="w-full pb-4 sm:pb-6 border-b border-border/60 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      {/* Floating Monolith Navigation Deck Container */}
+      <div
+        ref={deckContainerRef}
+        className="relative z-10 max-w-5xl w-full max-h-[92vh] bg-[#100d0e] border border-white/20 rounded-none shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col justify-between p-5 sm:p-8 overflow-y-auto no-scrollbar relative"
+      >
+        {/* Corner Reticle Brackets (Alien Monolith Deck) */}
+        <span className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t-2 border-l-2 border-white/70 pointer-events-none" />
+        <span className="absolute -top-[1px] -right-[1px] w-3 h-3 border-t-2 border-r-2 border-white/70 pointer-events-none" />
+        <span className="absolute -bottom-[1px] -left-[1px] w-3 h-3 border-b-2 border-l-2 border-white/70 pointer-events-none" />
+        <span className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b-2 border-r-2 border-white/70 pointer-events-none" />
+
+        {/* Dithered Nebula Atmospheric Noise */}
+        <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_20%,rgba(255,255,255,0.04),transparent_70%)]" />
+        <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:16px_16px] opacity-70" />
+        <div className="pointer-events-none absolute inset-0 z-0 opacity-20 mix-blend-screen bg-[radial-gradient(rgba(255,255,255,0.18)_1px,transparent_1px)] bg-[size:4px_4px]" />
+
+        {/* Top Bar: Brand ASCII Anchor, Jakarta Clock & Brutalist Close Button */}
+        <div className="w-full pb-4 sm:pb-6 border-b border-white/15 flex items-center justify-between relative z-10">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Link
               href="/"
               onClick={handleLinkClick}
@@ -232,26 +329,37 @@ export function KineticNavbarOverlay() {
               <AsciiLogo variant="header" animate3D={true} />
               <span className="sr-only">{"ARTHUR GvP // SYS.NAV"}</span>
             </Link>
-            <div className="hidden sm:block h-3 w-px bg-border/80" />
-            <div className="hidden sm:block">
-              <JakartaClock />
+
+            <div className="h-3 w-px bg-white/20" />
+
+            {/* Live Clock & Sector Header */}
+            <div className="flex items-center gap-2 text-[10px] sm:text-xs text-zinc-400 font-mono tracking-wider">
+              <span className="text-zinc-500 hidden md:inline">[SECTOR_NAV]</span>
+              <JakartaClock showSeconds={true} />
             </div>
           </div>
 
+          {/* Brutalist Close Action Trigger */}
           <button
             ref={closeButtonRef}
             type="button"
             onClick={handleClose}
             aria-label="Close navigation overlay (Escape)"
-            className="group flex items-center gap-2 px-3 py-1.5 bg-background-secondary border border-border rounded-xs hover:bg-foreground hover:text-background transition-colors cursor-pointer text-xs uppercase font-bold"
+            className="group relative flex items-center gap-2 px-3 py-1.5 bg-[#100d0e] border border-white/35 rounded-none hover:bg-white hover:text-black transition-all cursor-pointer text-xs uppercase font-bold tracking-widest"
           >
-            <span className="text-[11px] tracking-widest font-mono">ESC</span>
-            <X className="w-4 h-4 transition-transform group-hover:rotate-90" />
+            {/* Micro Reticles */}
+            <span className="absolute -top-[1px] -left-[1px] w-1 h-1 border-t border-l border-white/60 group-hover:border-black transition-colors" />
+            <span className="absolute -top-[1px] -right-[1px] w-1 h-1 border-t border-r border-white/60 group-hover:border-black transition-colors" />
+            <span className="absolute -bottom-[1px] -left-[1px] w-1 h-1 border-b border-l border-white/60 group-hover:border-black transition-colors" />
+            <span className="absolute -bottom-[1px] -right-[1px] w-1 h-1 border-b border-r border-white/60 group-hover:border-black transition-colors" />
+
+            <span className="text-[10px] tracking-widest font-mono">ESC</span>
+            <span className="text-sm leading-none font-bold">✕</span>
           </button>
         </div>
 
-        {/* Center Body: Bleibtgleich-Style Staggered Cards */}
-        <div ref={cardsContainerRef} className="py-6 sm:py-8 flex-1 flex flex-col justify-center">
+        {/* Center Body: Alien Artifact Monolith Route Cards */}
+        <div ref={cardsContainerRef} className="pt-6 sm:pt-8 pb-0 flex-1 flex flex-col justify-center relative z-10">
           <nav
             className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6"
             aria-label="Main Navigation"
@@ -269,99 +377,72 @@ export function KineticNavbarOverlay() {
                   onClick={handleLinkClick}
                   aria-current={isActive ? "page" : undefined}
                   className={cn(
-                    "nav-menu-card group relative flex flex-col justify-between p-5 sm:p-6 min-h-[140px] sm:min-h-[160px] border rounded-xs transition-all duration-300",
+                    "nav-menu-card group relative flex flex-col justify-between p-5 sm:p-6 min-h-[170px] sm:min-h-[190px]",
+                    "border rounded-none transition-all duration-300 relative overflow-hidden select-none",
                     isActive
-                      ? "border-foreground bg-white/[0.08] shadow-[0_0_20px_rgba(255,255,255,0.06)]"
-                      : "border-border/70 bg-background-secondary/50 hover:border-foreground hover:bg-background-secondary/90 hover:-translate-y-1"
+                      ? "border-white bg-white/[0.08] shadow-[0_0_24px_rgba(252,252,252,0.12)]"
+                      : "border-white/20 bg-black/40 hover:border-white hover:bg-white/[0.04] hover:-translate-y-1"
                   )}
                 >
-                  {/* Top of Card: Index number & arrow icon */}
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={cn(
-                        "font-mono text-xs transition-colors",
-                        isActive
-                          ? "text-foreground font-bold"
-                          : "text-foreground-muted group-hover:text-foreground"
-                      )}
-                    >
-                      {item.num}
+                  {/* Corner Reticle Brackets on Card */}
+                  <span className="absolute -top-[1px] -left-[1px] w-2 h-2 border-t border-l border-white/40 group-hover:border-white transition-colors" />
+                  <span className="absolute -top-[1px] -right-[1px] w-2 h-2 border-t border-r border-white/40 group-hover:border-white transition-colors" />
+                  <span className="absolute -bottom-[1px] -left-[1px] w-2 h-2 border-b border-l border-white/40 group-hover:border-white transition-colors" />
+                  <span className="absolute -bottom-[1px] -right-[1px] w-2 h-2 border-b border-r border-white/40 group-hover:border-white transition-colors" />
+
+                  {/* Giant Ambient Cosmic Object Glyph */}
+                  <span className="absolute -bottom-4 -right-2 text-7xl sm:text-8xl font-mono text-white opacity-[0.03] group-hover:opacity-[0.10] transition-opacity select-none pointer-events-none">
+                    {item.glyph}
+                  </span>
+
+                  {/* Top of Card: Sector Code + Glyph & Arrow */}
+                  <div className="flex items-center justify-between relative z-10">
+                    <span className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
+                      {item.sectorTag}
                     </span>
-                    <ArrowUpRight
-                      className={cn(
-                        "w-4 h-4 transition-all duration-200",
-                        isActive
-                          ? "opacity-100 translate-x-0.5 -translate-y-0.5 text-foreground"
-                          : "opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-foreground-secondary"
-                      )}
-                    />
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs text-white opacity-60 group-hover:opacity-100 transition-opacity">
+                        {item.glyph}
+                      </span>
+                      <ArrowUpRight
+                        className={cn(
+                          "w-3.5 h-3.5 transition-all duration-200",
+                          isActive
+                            ? "text-white filter drop-shadow-[0_0_6px_rgba(252,252,252,0.8)]"
+                            : "text-zinc-500 group-hover:text-white group-hover:filter group-hover:drop-shadow-[0_0_8px_rgba(252,252,252,0.85)]"
+                        )}
+                      />
+                    </div>
                   </div>
 
-                  {/* Bottom of Card: Prominent Label & Active Beacon */}
-                  <div className="flex items-center gap-2 mt-6">
-                    {isActive && (
-                      <span
-                        className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"
-                        title="Current Active Route"
-                      />
-                    )}
-                    <span
-                      className={cn(
-                        "text-xl sm:text-2xl font-bold font-sans tracking-tight uppercase transition-colors",
-                        isActive
-                          ? "text-foreground"
-                          : "text-foreground-secondary group-hover:text-foreground"
+                  {/* Bottom of Card: Major Label & Telemetry Subtitle */}
+                  <div className="flex flex-col gap-1 mt-6 relative z-10">
+                    <div className="flex items-center gap-2">
+                      {isActive && (
+                        <span
+                          className="w-1.5 h-1.5 rounded-none bg-white animate-pulse shadow-[0_0_8px_rgba(252,252,252,0.8)]"
+                          title="Active Sector"
+                        />
                       )}
-                    >
-                      {item.label}
-                    </span>
+                      <span
+                        className={cn(
+                          "text-2xl sm:text-3xl font-bold font-mono tracking-tight uppercase transition-colors",
+                          isActive ? "text-white" : "text-zinc-200 group-hover:text-white"
+                        )}
+                      >
+                        {item.label}
+                      </span>
+                    </div>
+                    <p className="font-mono text-[9px] sm:text-[10px] tracking-wider text-zinc-500 uppercase mt-0.5 group-hover:text-zinc-400 transition-colors">
+                      {item.description}
+                    </p>
                   </div>
                 </Link>
               );
             })}
           </nav>
         </div>
-
-        {/* Bottom Bar: 1-Click Email Copy & Social Shortcuts */}
-        <div className="w-full pt-4 sm:pt-6 border-t border-border/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          {/* Left: 1-Click Email Copy */}
-          <button
-            type="button"
-            onClick={handleCopyEmail}
-            aria-label="Copy email address to clipboard"
-            className="group flex items-center gap-2 px-3 py-1.5 bg-background border border-border rounded-xs hover:border-foreground transition-all cursor-pointer text-xs"
-          >
-            {copiedEmail ? (
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
-            ) : (
-              <Copy className="w-3.5 h-3.5 text-foreground-muted group-hover:text-foreground transition-colors" />
-            )}
-            <span className="font-mono text-foreground font-semibold">
-              {email}
-            </span>
-            <span className="text-[10px] text-foreground-muted uppercase tracking-wider ml-1">
-              {copiedEmail ? "[COPIED!]" : "[COPY]"}
-            </span>
-          </button>
-
-            {/* Right: Social Outbound Links */}
-            <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
-              {SOCIAL_LINKS.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => playHapticClick(720)}
-                  className="group inline-flex items-center gap-1 text-foreground-secondary hover:text-foreground transition-colors py-0.5"
-                >
-                  <span>{link.label}</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
+    </div>
   );
 }

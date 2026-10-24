@@ -57,6 +57,7 @@ export interface AsciiLogoProps {
   className?: string;
   variant?: "header" | "preloader" | "floating";
   animate3D?: boolean;
+  isSpinning?: boolean;
 }
 
 /**
@@ -69,6 +70,7 @@ export function AsciiLogo({
   className,
   variant = "header",
   animate3D = false,
+  isSpinning = true,
 }: AsciiLogoProps) {
   const isHeader = variant === "header";
   const isFloating = variant === "floating";
@@ -89,7 +91,12 @@ export function AsciiLogo({
         )}
         aria-hidden="true"
       >
-        <div className="relative w-full h-full [transform-style:preserve-3d] animate-spin-y flex items-center justify-center">
+        <div
+          className={cn(
+            "relative w-full h-full [transform-style:preserve-3d] flex items-center justify-center",
+            isSpinning && "animate-spin-y"
+          )}
+        >
           {/* Front Face */}
           <div className="absolute inset-0 flex items-center justify-center [backface-visibility:hidden]">
             <pre

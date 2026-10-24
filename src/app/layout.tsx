@@ -21,10 +21,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://arthurgvp.dev"),
-  title: {
-    default: "Arthur Gregorius Pongoh — Systems Architect & Creative Technologist",
-    template: "%s // Arthur GvP",
-  },
+  title: "ArthurGvP - Systems Architect & Creative Technologist",
   description:
     "Interactive portfolio of Arthur Gregorius Pongoh — Systems Architect & Creative Technologist.",
   keywords: [
@@ -46,7 +43,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Arthur Gregorius Pongoh — Systems Architect & Creative Technologist",
+    title: "ArthurGvP - Systems Architect & Creative Technologist",
     description:
       "Interactive portfolio of Arthur Gregorius Pongoh — Systems Architect & Creative Technologist.",
     url: "https://arthurgvp.dev",
@@ -56,7 +53,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Arthur Gregorius Pongoh — Systems Architect & Creative Technologist",
+    title: "ArthurGvP - Systems Architect & Creative Technologist",
     description:
       "Interactive portfolio of Arthur Gregorius Pongoh — Systems Architect & Creative Technologist.",
     creator: "@arthurgvp",
@@ -74,10 +71,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icon.png", sizes: "any" },
-      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png?v=2", sizes: "any" },
+      { url: "/favicon.ico?v=2", sizes: "any" },
     ],
-    apple: [{ url: "/apple-icon.png" }],
+    apple: [{ url: "/apple-icon.png?v=2" }],
   },
 };
 

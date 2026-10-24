@@ -4,8 +4,9 @@ import { TactileFooter } from "@/components/footer/TactileFooter";
 
 export default function NotFound() {
   return (
-    <main className="min-h-screen flex flex-col justify-between pt-24 sm:pt-32 px-4 sm:px-6 lg:px-8 selection:bg-foreground selection:text-background">
-      <div className="flex-1 flex flex-col items-center justify-center text-center">
+    <main className="w-full min-h-screen flex flex-col relative selection:bg-foreground selection:text-background">
+      {/* 1st Viewport Section: 100% Screen Height, Dead-Center Title */}
+      <section className="w-full h-screen h-dvh min-h-screen min-h-dvh flex flex-col items-center justify-center px-4 text-center relative">
         <h1 className="text-4xl sm:text-6xl md:text-8xl font-black font-sans uppercase tracking-tight text-foreground">
           404
         </h1>
@@ -18,7 +19,9 @@ export default function NotFound() {
         >
           Return Home
         </Link>
-      </div>
+      </section>
+
+      {/* Footer positioned below 1st viewport fold (scroll to reveal) */}
       <TactileFooter />
     </main>
   );
